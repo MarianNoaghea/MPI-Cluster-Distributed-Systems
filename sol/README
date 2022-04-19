@@ -1,0 +1,32 @@
+Noaghea Marian-Florentin 333CC
+
+1) Stabilirea topologiei
+
+Topologia consta in 2 lucruri: o matrice topology de 3 x nr_procese(in care o 
+valoare diferita de 0 reprezinta o cale de comunicare) si un vector
+nr_workers de dimensiune 3(in care se stie nr de workeri pentru fiecare cluster).
+Rankurile 0, 1 si 2 vor citi fiecare din fisierul de cluster destinat lor si vor 
+popula linia destinata fiecarui rank din matrice.
+Dupa care isi vor trimite fiecare catre celelalte doua procese coordonator 
+doua lucruri: vectorul linie din matricea topology si un vector de 3 elemente 
+reprezentand nr de workeri pt fiecare coordonator.
+Dupa care ce un coordonator va trimite topologia va fi pregatit sa primeasca restul 
+topologiei de la celelalte procese.
+Cand topologia este cunoscuta de toti coordonatorii acestia vor trimite mai departe 
+workerilor liniile din matricea topology si vectorul nr_workers, dupa care workerii 
+vor primi aceste informatii.
+
+2) Realizarea calculelor
+
+Rankul 0 este procesul coordonator acesta obtine numarul total de workeri
+din intreaga topologie, se calculeaza offsetul si diferenta(ce nu se imparte 
+fix la nr total de workeri).
+Se cauta clusterul cu cei mai multi workeri, acesta fiind folositor ca sa 
+stiu cand trebuie sa trimit diferenta primului worker din acel cluster.
+Trimit workerilor lui 0 bucati de vector (raportate la nr de workeri ai clusterului 0)  
+si coordonatorilor 1 si 2 (raportate la nr de workeri din 
+cluster), se fac 2 senduri: sizeul bucatii, pozitia din vectorul mare 
+(pozitia se updateaza cu sizeul trimis).
+Se face recv de la workerii lui 0, apoi recv de la coordonatorii 1 si 2.
+Coordonatorii 1 si 2 vor avea o dinamica similara cu workerii lor la fel 
+ca dinamica dintre coordonatorul 0 si workerii lui.
